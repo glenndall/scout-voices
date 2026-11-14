@@ -4,8 +4,9 @@ voiceprint, as a Markdown table (for a pull request's check summary).
 
     python3 tools/verify_pr.py <path to YakScout's scout.py folder> voices/farm-0003.json ...
 
-Starts with a plain verdict (✅ checks out, ❌ don't merge, ⏸ couldn't check yet). Exits 1 unless the voice checked
-out: an example with a different voice, or none that could be heard (YouTube sometimes refuses GitHub's servers)."""
+Starts with a plain verdict (✅ checks out, ❌ don't merge, 🏠 check it at home). Exits 1 only if an example could be
+heard and has a different voice; YouTube usually refuses GitHub's servers, and then it points to YakTube's
+Submissions list instead."""
 import json, os, sys
 
 
@@ -45,8 +46,8 @@ def main(scout_dir, paths):
         verdict = "✅ **Mostly checked.** The examples that could be heard have the submitted voice; the rest couldn't be " \
                   "fetched. Look at the channels, then merge."
     else:
-        verdict = "⏸ **Couldn't check yet.** YouTube didn't let GitHub listen to any example. Don't merge yet: re-run " \
-                  "this check later (Re-run jobs), or ask for it to be checked at home."
+        verdict = "🏠 **Check this one at home.** YouTube doesn't let GitHub's servers listen to Shorts. In YakTube: " \
+                  "**Settings → YakScout → Submissions → Check**, and merge if it says ✅."
     lines = [verdict, ""] + lines + [f"(Same voice = gap {scout.VOICE_MATCH} or less.)"]
     text = "\n".join(lines) + "\n"
     print(text)
@@ -54,7 +55,7 @@ def main(scout_dir, paths):
     if summary:
         with open(summary, "a") as f:
             f.write("## Voice check\n\n" + text)
-    return 1 if different or not measured else 0
+    return 1 if different else 0
 
 
 if __name__ == "__main__":

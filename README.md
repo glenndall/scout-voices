@@ -58,8 +58,8 @@ If it's a voice already on the list, `check.py` says so: add your channels and e
 - **check (automatic):** makes sure each file is complete, has its evidence, uses the right model, and isn't a voice
   already on the list.
 - **verify (automatic):** listens to every example Short with YakScout and posts a plain verdict as a comment on the
-  pull request: ✅ the voice checks out, ❌ don't merge (an example has a different voice), or ⏸ couldn't check yet
-  (YouTube didn't let GitHub listen; re-run it later). A table under it shows each example.
+  pull request: ✅ the voice checks out, ❌ don't merge (an example has a different voice), or 🏠 check it at
+  home (usually: YouTube doesn't let GitHub listen). A table under it shows each example.
 - **At home (YakTube's Submissions list):** YouTube usually refuses GitHub's servers, so the maintainer's YakTube
   does the listening: **Settings → YakScout → Submissions → Check** runs the voice check and the titles & captions farm
   check on every open pull request and shows one verdict (✅ looks good to merge, ⚠️ look at the channels, ❌ don't
