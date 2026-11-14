@@ -107,7 +107,7 @@ def existing_voices():
 
 
 def download(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "yakscout-voices-bot"})
+    req = urllib.request.Request(url, headers={"User-Agent": "scout-voices-bot"})
     with urllib.request.urlopen(req, timeout=20) as r:
         data = r.read(200_001)
     if len(data) > 200_000:

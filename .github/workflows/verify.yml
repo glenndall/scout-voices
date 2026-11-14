@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4                 # main: the trusted check.py and tools/
       - uses: actions/checkout@v4
         with:
-          repository: glenndall/yakscout
+          repository: glenndall/scout
           path: .yakscout
       - uses: actions/setup-python@v5
         with:

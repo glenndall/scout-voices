@@ -3,7 +3,7 @@
 ## 1. Overview & Purpose
 
 - **What it is:** a shared, community-reviewed list of the synthetic voices that YouTube content farms reuse across
-  channel after channel. [Scout](https://github.com/glenndall/yakscout) downloads it once a day and uses it alongside
+  channel after channel. [Scout](https://github.com/glenndall/scout) downloads it once a day and uses it alongside
   the voices each person teaches it, so a farm one person catches is caught for everyone.
 - **Why voices:** farms open new channels faster than anyone can list them, but they keep the same text-to-speech
   voice. A voice on the list is recognised on a brand-new channel the first time it posts.
@@ -31,7 +31,7 @@
 ## 3. Using the List
 
 - **Scout 0.6 or later uses it automatically:** nothing to set up. It downloads
-  `https://raw.githubusercontent.com/glenndall/yakscout-voices/main/voices.json` at start-up and once a day, and keeps
+  `https://raw.githubusercontent.com/glenndall/scout-voices/main/voices.json` at start-up and once a day, and keeps
   it in `shared-voices.json` next to its own `voices.json`.
 - **Download it now:** `python scout.py lists`.
 - **Hide a voice for yourself:** **×** on it in YakTube's **Settings → Scout → Voices**. The list itself is untouched.
