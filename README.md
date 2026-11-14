@@ -15,7 +15,7 @@
 - Each farm voice is one small file in [`voices/`](voices/): a **voiceprint** (512 numbers describing how the voice
   sounds, not a recording), the **channels** it has been heard on, and **example Shorts** as evidence.
 - [`check.py`](check.py) checks every file and builds [`voices.json`](voices.json), the single file YakScout downloads.
-  GitHub runs it on every pull request.
+  GitHub checks every pull request, listens to its example Shorts, and rebuilds `voices.json` after each merge.
 - A voice heard on 2 or more channels counts for 50 points in YakScout, enough to drop a Short by itself (see
   YakScout's README).
 - Voiceprints are only comparable when made by the same model and method, so every file names its `model`. If
@@ -47,18 +47,23 @@
    voiceprint, channels and example Shorts.
 3. **Rename it** to a free id (`farm-0003.json`, with the same `id` inside) and add a short `note` describing the
    Shorts (e.g. "Roblox story Shorts that open 'In this world, everyone ...'").
-4. **Check it:** put it in `voices/`, run `python3 check.py`, and commit the file together with the rebuilt
-   `voices.json`.
-5. **Open a pull request.** Say how you know the channels are farms.
+4. **Check it (optional):** put it in `voices/` and run `python3 check.py --check`. GitHub runs the same check.
+5. **Open a pull request** adding just your file. Say how you know the channels are farms. You don't need to touch
+   `voices.json`: GitHub rebuilds it after the merge.
 
 If it's a voice already on the list, `check.py` says so: add your channels and examples to that file instead.
 
 ## 5. Review Process
 
-- **Automatic:** `check.py` makes sure each file is complete and that no two voices are the same.
-- **By a person:** a reviewer runs `python scout.py verify voices/<id>.json`, which listens to every example Short and
-  shows how close its voice is to the submitted voiceprint (0.25 or less is the same voice). They also look at the
-  channels: mass-produced, templated Shorts, not one creator who happens to use a stock voice.
+- **check (automatic):** makes sure each file is complete, has its evidence, uses the right model, and isn't a voice
+  already on the list.
+- **verify (automatic):** listens to every example Short with YakScout and shows, in the check's summary, how close
+  each one's voice is to the submitted voiceprint (0.25 or less is the same voice). It fails if an example has a
+  different voice. YouTube sometimes refuses GitHub's servers; those examples show "couldn't check", and a reviewer can
+  run `python scout.py verify voices/<id>.json` at home instead.
+- **By a person:** the maintainer reads verify's table and looks at the channels (mass-produced, templated Shorts, not
+  one creator who happens to use a stock voice), then merges. Nothing reaches the list without that.
+- **build (automatic):** after the merge, GitHub rebuilds `voices.json`; every YakScout picks it up within a day.
 - **Not merged:** a single channel, examples that don't match, or any sign that it's a real person's voice.
 - **Removal:** if a voice catches honest creators, or you believe it's yours, open an issue with an example. Voices
   that do more harm than good are removed.

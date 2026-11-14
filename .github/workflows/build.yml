@@ -1,0 +1,28 @@
+# After a merge into main: rebuilds voices.json (the file YakScout downloads) from voices/ and commits it, so
+# contributors only add their voice file. Also runs by hand (Actions > build > Run workflow).
+name: build
+on:
+  push:
+    branches: [main]
+    paths: ["voices/**", "check.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild voices.json
+        run: python3 check.py
+      - name: Commit it if it changed
+        run: |
+          if git diff --quiet voices.json; then echo "voices.json already up to date"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add voices.json
+          git commit -m "Rebuild voices.json"
+          git push

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Check every voice in voices/ and build voices.json, the list YakScout downloads.
 
-    python3 check.py           check, then (re)build voices.json
-    python3 check.py --check   check, and fail if voices.json isn't up to date (what GitHub runs on each pull request)
+    python3 check.py           check, then (re)build voices.json (GitHub does this after each merge)
+    python3 check.py --check   only check the voice files (what GitHub runs on each pull request)
 
 Only Python's standard library: no installs needed."""
 import datetime, glob, json, math, os, re, sys
@@ -92,10 +92,10 @@ def main(check_only=False):
     except OSError:
         current = ""
     if check_only:
-        if current != text:
-            print("voices.json is out of date: run python3 check.py and commit it")
-            return 1
-        print(f"OK: {len(voices)} voices, voices.json up to date")
+        print(f"OK: {len(voices)} voices" + ("" if current == text else " (voices.json is rebuilt after merging)"))
+        return 0
+    if current == text:
+        print(f"OK: {len(voices)} voices; voices.json already up to date")
         return 0
     with open(target, "w") as f:
         f.write(text)
