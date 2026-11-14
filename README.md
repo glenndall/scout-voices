@@ -57,12 +57,11 @@ If it's a voice already on the list, `check.py` says so: add your channels and e
 
 - **check (automatic):** makes sure each file is complete, has its evidence, uses the right model, and isn't a voice
   already on the list.
-- **verify (automatic):** listens to every example Short with YakScout and shows, in the check's summary, how close
-  each one's voice is to the submitted voiceprint (0.25 or less is the same voice). It fails if an example has a
-  different voice. YouTube sometimes refuses GitHub's servers; those examples show "couldn't check", and a reviewer can
-  run `python scout.py verify voices/<id>.json` at home instead.
-- **By a person:** the maintainer reads verify's table and looks at the channels (mass-produced, templated Shorts, not
-  one creator who happens to use a stock voice), then merges. Nothing reaches the list without that.
+- **verify (automatic):** listens to every example Short with YakScout and posts a plain verdict as a comment on the
+  pull request: ✅ the voice checks out, ❌ don't merge (an example has a different voice), or ⏸ couldn't check yet
+  (YouTube didn't let GitHub listen; re-run it later). A table under it shows each example.
+- **Final approval (the maintainer):** read the verdict, glance at the channels (lots of near-identical Shorts, not one
+  person's channel), and press **Merge**. Nothing reaches the list without that.
 - **build (automatic):** after the merge, GitHub rebuilds `voices.json`; every YakScout picks it up within a day.
 - **Not merged:** a single channel, examples that don't match, or any sign that it's a real person's voice.
 - **Removal:** if a voice catches honest creators, or you believe it's yours, open an issue with an example. Voices
