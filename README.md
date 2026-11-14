@@ -60,8 +60,12 @@ If it's a voice already on the list, `check.py` says so: add your channels and e
 - **verify (automatic):** listens to every example Short with YakScout and posts a plain verdict as a comment on the
   pull request: ✅ the voice checks out, ❌ don't merge (an example has a different voice), or ⏸ couldn't check yet
   (YouTube didn't let GitHub listen; re-run it later). A table under it shows each example.
+- **At home (YakTube's Submissions list):** YouTube usually refuses GitHub's servers, so the maintainer's YakTube
+  does the listening: **Settings → YakScout → Submissions → Check** runs the voice check and the titles & captions farm
+  check on every open pull request and shows one verdict (✅ looks good to merge, ⚠️ look at the channels, ❌ don't
+  merge, ⏸ couldn't check yet).
 - **Final approval (the maintainer):** read the verdict, glance at the channels (lots of near-identical Shorts, not one
-  person's channel), and press **Merge**. Nothing reaches the list without that.
+  person's channel), and press **Merge** on GitHub. Nothing reaches the list without that.
 - **build (automatic):** after the merge, GitHub rebuilds `voices.json`; every YakScout picks it up within a day.
 - **Not merged:** a single channel, examples that don't match, or any sign that it's a real person's voice.
 - **Removal:** if a voice catches honest creators, or you believe it's yours, open an issue with an example. Voices
