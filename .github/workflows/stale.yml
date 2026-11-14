@@ -1,0 +1,29 @@
+# Submissions the bot marked "incomplete" (not enough channels or Shorts yet) close themselves after 30 days, so the
+# issue list only holds things that need a person. Reopening one (or editing it) starts the clock again.
+name: stale
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/stale@v9
+        with:
+          only-labels: incomplete
+          days-before-issue-stale: 21
+          days-before-issue-close: 9
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          stale-issue-label: stale
+          stale-issue-message: >
+            Still missing something (see the comment above). This closes in 9 days; edit it to keep it open, or
+            reopen it later when you have a second channel and Short.
+          close-issue-message: >
+            Closed for now. Reopen it when you have the missing channels or Shorts, and the check runs again.

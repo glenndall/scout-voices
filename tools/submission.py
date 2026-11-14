@@ -123,6 +123,17 @@ def comment(repo, issue, text):
     run("gh", "issue", "comment", str(issue), "--repo", repo, "--body", text)
 
 
+def label(repo, issue, add):
+    """Mark an issue 'incomplete' (or clear it). A failure here never stops the submission."""
+    try:
+        if add:
+            subprocess.run(["gh", "label", "create", "incomplete", "--repo", repo, "--color", "d4c5f9",
+                            "--description", "Missing something; closes itself after 30 days"], capture_output=True)
+        run("gh", "issue", "edit", str(issue), "--repo", repo, "--add-label" if add else "--remove-label", "incomplete")
+    except Exception:
+        pass
+
+
 def main():
     if "--dry-run" in sys.argv:
         with open(sys.argv[-1]) as f:
@@ -134,9 +145,12 @@ def main():
     repo, issue = os.environ["GITHUB_REPOSITORY"], int(event["issue"]["number"])
     result = plan(event["issue"].get("body", ""), existing_voices(), download)
     if result.get("problems"):
+        label(repo, issue, add=True)                    # so the maintainer can skip these; the stale workflow closes them
         comment(repo, issue, "Thanks! This can't be added yet:\n\n" + "\n".join(f"- {p}" for p in result["problems"]) +
-                "\n\nEdit the issue to fix it, and this check runs again.")
+                "\n\nEdit the issue to fix it, and this check runs again. "
+                "(It closes by itself after 30 days; reopen it any time.)")
         return
+    label(repo, issue, add=False)
     branch = f"submission-{issue}"
     run("git", "config", "user.name", "github-actions[bot]")
     run("git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
