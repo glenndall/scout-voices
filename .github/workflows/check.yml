@@ -1,0 +1,12 @@
+# Checks every voice file and that voices.json was rebuilt from them, on each push and pull request.
+name: check
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check voices and voices.json
+        run: python3 check.py --check
