@@ -1,4 +1,4 @@
-# After a merge into main: rebuilds voices.json (the file YakScout downloads) from voices/ and commits it, so
+# After a merge into main: rebuilds voices.json (the file Scout downloads) from voices/ and commits it, so
 # contributors only add their voice file. Also runs by hand (Actions > build > Run workflow).
 name: build
 on:

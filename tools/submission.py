@@ -166,7 +166,7 @@ def main():
         comment(repo, issue, f"Updated the submission: #{existing}.")
         return
     body = (f"From #{issue}. Made by the submission bot from the issue form.\n\n"
-            "Maintainer: in YakTube, **Settings → YakScout → Submissions → Check**, and merge if it says ✅.\n\n"
+            "Maintainer: in YakTube, **Settings → Scout → Submissions → Check**, and merge if it says ✅.\n\n"
             f"Closes #{issue}")
     url = run("gh", "pr", "create", "--repo", repo, "--head", branch, "--base", "main", "--title", title, "--body", body)
     comment(repo, issue, f"Thanks! It's ready for review: {url}")

@@ -1,4 +1,4 @@
-# On a pull request that adds or changes voices: listens to each one's example Shorts with YakScout and posts a plain
+# On a pull request that adds or changes voices: listens to each one's example Shorts with Scout and posts a plain
 # verdict as a comment on the pull request (✅ checks out / ❌ don't merge / ⏸ couldn't check yet).
 #
 # Safety: this runs the workflow and scripts from main (pull_request_target), never the pull request's own code. From
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install YakScout's voice check
+      - name: Install Scout's voice check
         run: |
           pip install --quiet numpy==2.1.3 onnxruntime==1.20.1 imageio-ffmpeg==0.6.0 yt-dlp
           python .yakscout/get_model.py .yakscout/models

@@ -1,5 +1,5 @@
 name: Submit a farm voice
-description: Found a content-farm voice with YakScout? Send it here. No git needed.
+description: Found a content-farm voice with Scout? Send it here. No git needed.
 title: "Voice: "
 labels: ["voice-submission"]
 body:
@@ -9,7 +9,7 @@ body:
         Thanks for helping keep content farms out. Fill in the boxes below; a bot turns this into a submission and the
         maintainer checks it before it joins the list. **Synthetic farm voices only, never a real person's.**
 
-        Easiest: in YakTube, **Settings → YakScout → Voices → Share** on the voice. It downloads the voice file and
+        Easiest: in YakTube, **Settings → Scout → Voices → Share** on the voice. It downloads the voice file and
         opens this form with the Shorts and channels already filled in.
   - type: textarea
     id: examples

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check every voice in voices/ and build voices.json, the list YakScout downloads.
+"""Check every voice in voices/ and build voices.json, the list Scout downloads.
 
     python3 check.py           check, then (re)build voices.json (GitHub does this after each merge)
     python3 check.py --check   only check the voice files (what GitHub runs on each pull request)
@@ -8,8 +8,8 @@ Only Python's standard library: no installs needed."""
 import datetime, glob, json, math, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-MODEL_ID = "campplus-en-voxceleb-16k/fbank80-2s-avg/1"   # must match YakScout's MODEL_ID
-SAME_VOICE = 0.25                                        # YakScout's match limit: closer than this is one voice
+MODEL_ID = "campplus-en-voxceleb-16k/fbank80-2s-avg/1"   # must match Scout's MODEL_ID
+SAME_VOICE = 0.25                                        # Scout's match limit: closer than this is one voice
 ID_RE = re.compile(r"[a-z0-9][a-z0-9-]{2,39}")
 VID_RE = re.compile(r"[A-Za-z0-9_-]{11}")
 FIELDS = {"id", "model", "added", "channels", "examples", "note", "print"}
@@ -28,7 +28,7 @@ def problems(v, filename):
     elif filename != v["id"] + ".json":
         out.append(f"the file must be named {v['id']}.json")
     if v.get("model") != MODEL_ID:
-        out.append(f"model must be {MODEL_ID} (re-learn the voice with an up-to-date YakScout)")
+        out.append(f"model must be {MODEL_ID} (re-learn the voice with an up-to-date Scout)")
     try:
         datetime.date.fromisoformat(v.get("added", ""))
     except (TypeError, ValueError):
@@ -47,7 +47,7 @@ def problems(v, filename):
         out.append("note: up to 200 characters")
     p = v.get("print")
     if not (isinstance(p, list) and len(p) == 512 and all(isinstance(x, (int, float)) and math.isfinite(x) for x in p)):
-        out.append("print: 512 numbers (the voiceprint YakScout's Share makes)")
+        out.append("print: 512 numbers (the voiceprint Scout's Share makes)")
     elif abs(math.sqrt(sum(x * x for x in p)) - 1) > 0.01:
         out.append("print: not a unit-length voiceprint (don't edit it by hand)")
     return out

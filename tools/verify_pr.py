@@ -2,7 +2,7 @@
 """Listen to the example Shorts of each voice file given and report how close each one's voice is to the file's
 voiceprint, as a Markdown table (for a pull request's check summary).
 
-    python3 tools/verify_pr.py <path to YakScout's scout.py folder> voices/farm-0003.json ...
+    python3 tools/verify_pr.py <path to Scout's scout.py folder> voices/farm-0003.json ...
 
 Starts with a plain verdict (✅ checks out, ❌ don't merge, 🏠 check it at home). Exits 1 only if an example could be
 heard and has a different voice; YouTube usually refuses GitHub's servers, and then it points to YakTube's
@@ -47,7 +47,7 @@ def main(scout_dir, paths):
                   "fetched. Look at the channels, then merge."
     else:
         verdict = "🏠 **Check this one at home.** YouTube doesn't let GitHub's servers listen to Shorts. In YakTube: " \
-                  "**Settings → YakScout → Submissions → Check**, and merge if it says ✅."
+                  "**Settings → Scout → Submissions → Check**, and merge if it says ✅."
     lines = [verdict, ""] + lines + [f"(Same voice = gap {scout.VOICE_MATCH} or less.)"]
     text = "\n".join(lines) + "\n"
     print(text)
