@@ -4,15 +4,15 @@ voiceprint, as a Markdown table (for a pull request's check summary).
 
     python3 tools/verify_pr.py <path to YakScout's scout.py folder> voices/farm-0003.json ...
 
-Exits 1 if any example could be measured and has a different voice (a reviewer should look); a Short that couldn't
-be fetched (YouTube sometimes refuses GitHub's servers) doesn't fail it."""
+Starts with a plain verdict (✅ checks out, ❌ don't merge, ⏸ couldn't check yet). Exits 1 unless the voice checked
+out: an example with a different voice, or none that could be heard (YouTube sometimes refuses GitHub's servers)."""
 import json, os, sys
 
 
 def main(scout_dir, paths):
     sys.path.insert(0, os.path.abspath(scout_dir))
     import scout
-    lines, different = [], 0
+    lines, different, measured, unchecked = [], 0, 0, 0
     for path in paths:
         try:
             with open(path) as f:
@@ -30,20 +30,31 @@ def main(scout_dir, paths):
             if isinstance(gap, float):
                 ok = gap <= scout.VOICE_MATCH
                 different += not ok
+                measured += 1
                 lines.append(f"| {link} | {channel or '?'} | {gap + 0.0:.3f} | {'same voice' if ok else '**different voice**'} |")
             else:
                 lines.append(f"| {link} | {channel or '?'} | - | couldn't check: {gap or 'no talking at the start'} |")
+                unchecked += 1
         lines.append("")
-    lines.append(f"Same voice = gap {scout.VOICE_MATCH} or less. "
-                 + ("**Some examples have a different voice: look before merging.**" if different else
-                    "Also look at the channels: mass-produced, templated Shorts, not one creator."))
+    if different:
+        verdict = "❌ **Don't merge.** Some example Shorts have a different voice from the one submitted."
+    elif measured and not unchecked:
+        verdict = "✅ **The voice checks out.** Every example Short has the submitted voice. Last step: look at the channels " \
+                  "(lots of near-identical Shorts, not one person's channel), then merge."
+    elif measured:
+        verdict = "✅ **Mostly checked.** The examples that could be heard have the submitted voice; the rest couldn't be " \
+                  "fetched. Look at the channels, then merge."
+    else:
+        verdict = "⏸ **Couldn't check yet.** YouTube didn't let GitHub listen to any example. Don't merge yet: re-run " \
+                  "this check later (Re-run jobs), or ask for it to be checked at home."
+    lines = [verdict, ""] + lines + [f"(Same voice = gap {scout.VOICE_MATCH} or less.)"]
     text = "\n".join(lines) + "\n"
     print(text)
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary:
         with open(summary, "a") as f:
             f.write("## Voice check\n\n" + text)
-    return 1 if different else 0
+    return 1 if different or not measured else 0
 
 
 if __name__ == "__main__":
