@@ -40,18 +40,21 @@
 
 ## 4. Contributing a Voice
 
+**The easy way (no git needed)**
 1. **Teach YakScout the voice** from at least 2 farm Shorts on 2 different channels: in YakTube, **Settings →
-   YakScout → Voices → Learn**, or `python scout.py learn <link>`. Learning a voice it already knows adds the channel
-   and the Short to it.
-2. **Make the submission file:** `python scout.py share <voice name>` writes `voice-<name>.json`, holding its
-   voiceprint, channels and example Shorts.
-3. **Rename it** to a free id (`farm-0003.json`, with the same `id` inside) and add a short `note` describing the
-   Shorts (e.g. "Roblox story Shorts that open 'In this world, everyone ...'").
-4. **Check it (optional):** put it in `voices/` and run `python3 check.py --check`. GitHub runs the same check.
-5. **Open a pull request** adding just your file. Say how you know the channels are farms. You don't need to touch
-   `voices.json`: GitHub rebuilds it after the merge.
+   YakScout → Voices → Learn**. Learning a voice it already knows adds the channel and the Short to it.
+2. **Press Share** on that voice. It downloads the voice file and opens the
+   [**Submit a farm voice**](../../issues/new?template=submit-voice.yml) form with the Shorts and channels filled in.
+3. **Drag the downloaded file** into the form's *Voice file* box, say in a sentence why it's a farm, tick the two
+   rules, and press **Create**.
+4. **A bot turns it into a pull request** (or adds your channels to that voice if it's already on the list), or
+   comments on your form saying what to fix. Edit the form and it tries again.
 
-If it's a voice already on the list, `check.py` says so: add your channels and examples to that file instead.
+**The git way**
+1. `python scout.py share <voice name>` writes `voice-<name>.json`. Rename it to a free id (`farm-0003.json`, with the
+   same `id` inside) and add a short `note`.
+2. Put it in `voices/`, check it with `python3 check.py --check`, and open a pull request adding just that file.
+   GitHub rebuilds `voices.json` after the merge.
 
 ## 5. Review Process
 

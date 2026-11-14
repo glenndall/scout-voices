@@ -1,0 +1,53 @@
+name: Submit a farm voice
+description: Found a content-farm voice with YakScout? Send it here. No git needed.
+title: "Voice: "
+labels: ["voice-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping keep content farms out. Fill in the boxes below; a bot turns this into a submission and the
+        maintainer checks it before it joins the list. **Synthetic farm voices only, never a real person's.**
+
+        Easiest: in YakTube, **Settings → YakScout → Voices → Share** on the voice. It downloads the voice file and
+        opens this form with the Shorts and channels already filled in.
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example Shorts
+      description: Links to at least 2 Shorts with this voice, from at least 2 different channels. One per line.
+      placeholder: |
+        https://youtube.com/shorts/...
+        https://youtube.com/shorts/...
+    validations:
+      required: true
+  - type: textarea
+    id: channels
+    attributes:
+      label: Channels
+      description: The channels you've heard this voice on (at least 2). One per line.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Why it's a content farm
+      description: In a sentence or two. For example, "dozens of near-identical story Shorts a day, same script".
+    validations:
+      required: true
+  - type: textarea
+    id: voice
+    attributes:
+      label: Voice file
+      description: Drag the voice-….json file that Share downloaded into this box (or paste its contents).
+    validations:
+      required: true
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Rules
+      options:
+        - label: This is a synthetic voice used by content-farm channels, not a real person's voice.
+          required: true
+        - label: I learned it from these channels' Shorts myself.
+          required: true

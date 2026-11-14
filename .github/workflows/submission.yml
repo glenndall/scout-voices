@@ -1,0 +1,27 @@
+# When someone fills in the "Submit a farm voice" form (an issue labelled voice-submission), or edits it: turn it into
+# a pull request adding the voice, or comment on the issue saying what to fix. The issue's text is only read as data by
+# tools/submission.py; nothing from it is run.
+name: submission
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: submission-${{ github.event.issue.number }}
+
+jobs:
+  submission:
+    if: contains(github.event.issue.labels.*.name, 'voice-submission')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Turn the form into a pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/submission.py
