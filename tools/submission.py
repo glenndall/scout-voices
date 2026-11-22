@@ -64,8 +64,9 @@ def lines(text):
     return out
 
 
-def plan(body, existing, download, today=None):
-    """Decide what to do with one issue. existing = {id: voice dict} already on the list.
+def plan(body, existing, download, today=None, reserved=()):
+    """Decide what to do with one issue. existing = {id: voice dict} already on the list; reserved = ids that other
+    open pull requests are adding, so two submissions never take the same one.
     Returns {"problems": [...]} or {"file": name, "voice": dict, "new": bool, "id": ...}."""
     s = sections(body)
     examples = list(dict.fromkeys(VID.findall(s.get("examples", ""))))
@@ -88,7 +89,7 @@ def plan(body, existing, download, today=None):
         if merged == same:
             return {"problems": [f"that's {same['id']}, already on the list with these channels and Shorts. Thanks!"]}
         return {"file": same["id"] + ".json", "voice": merged, "new": False, "id": same["id"]}
-    n = max([int(m.group(1)) for k in existing for m in [re.fullmatch(r"farm-(\d{4})", k)] if m] + [0]) + 1
+    n = max([int(m.group(1)) for k in [*existing, *reserved] for m in [re.fullmatch(r"farm-(\d{4})", k)] if m] + [0]) + 1
     vid = f"farm-{n:04d}"
     note = re.sub(r"\s+", " ", s.get("evidence", ""))[:200]
     entry = {"id": vid, "model": voice.get("model"), "added": today or datetime.date.today().isoformat(),
@@ -104,6 +105,13 @@ def existing_voices():
             v = json.load(f)
         out[v.get("id", os.path.basename(p)[:-5])] = v
     return out
+
+
+def reserved_ids(repo, branch):
+    """Voice ids that other open submission pull requests are adding (this issue's own is not counted)."""
+    prs = json.loads(run("gh", "pr", "list", "--repo", repo, "--state", "open", "--limit", "100", "--json", "headRefName,files") or "[]")
+    return {m.group(1) for pr in prs if pr["headRefName"] != branch for f in pr["files"]
+            for m in [re.fullmatch(r"voices/(farm-\d{4})\.json", f["path"])] if m}
 
 
 def download(url):
@@ -143,7 +151,8 @@ def main():
     with open(os.environ["GITHUB_EVENT_PATH"]) as f:
         event = json.load(f)
     repo, issue = os.environ["GITHUB_REPOSITORY"], int(event["issue"]["number"])
-    result = plan(event["issue"].get("body", ""), existing_voices(), download)
+    branch = f"submission-{issue}"
+    result = plan(event["issue"].get("body", ""), existing_voices(), download, reserved=reserved_ids(repo, branch))
     if result.get("problems"):
         label(repo, issue, add=True)                    # so the maintainer can skip these; the stale workflow closes them
         comment(repo, issue, "Thanks! This can't be added yet:\n\n" + "\n".join(f"- {p}" for p in result["problems"]) +
@@ -151,7 +160,6 @@ def main():
                 "(It closes by itself after 30 days; reopen it any time.)")
         return
     label(repo, issue, add=False)
-    branch = f"submission-{issue}"
     run("git", "config", "user.name", "github-actions[bot]")
     run("git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
     run("git", "checkout", "-B", branch)

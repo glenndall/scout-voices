@@ -11,8 +11,10 @@ permissions:
   pull-requests: write
   issues: write
 
+# One run at a time for the whole repo: each run looks at the open pull requests before it picks the next voice id,
+# so a second submission waits for the first one's pull request instead of taking the same id.
 concurrency:
-  group: submission-${{ github.event.issue.number }}
+  group: submission
 
 jobs:
   submission:
