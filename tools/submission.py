@@ -64,9 +64,9 @@ def lines(text):
     return out
 
 
-def plan(body, existing, download, today=None, reserved=()):
-    """Decide what to do with one issue. existing = {id: voice dict} already on the list; reserved = ids that other
-    open pull requests are adding, so two submissions never take the same one.
+def plan(body, existing, download, today=None, pending=None):
+    """Decide what to do with one issue. existing = {id: voice dict} already on the list; pending = {id: (voice, pr number)}
+    that other open pull requests are adding or changing, so two submissions never take the same id or the same voice.
     Returns {"problems": [...]} or {"file": name, "voice": dict, "new": bool, "id": ...}."""
     s = sections(body)
     examples = list(dict.fromkeys(VID.findall(s.get("examples", ""))))
@@ -80,6 +80,11 @@ def plan(body, existing, download, today=None, reserved=()):
     if problems or voice is None:
         return {"problems": problems}
     print_ = voice.get("print")
+    waiting = next(((k, num) for k, (v, num) in (pending or {}).items() if isinstance(print_, list) and len(print_) == 512
+                    and check.problems(v, k + ".json") == [] and check.gap(v["print"], print_) <= check.SAME_VOICE), None)
+    if waiting:                                         # the same voice is already in an open pull request
+        return {"problems": [f"that's {waiting[0]}, already waiting to be merged in #{waiting[1]}. Once it is, edit this "
+                             "issue and this check runs again."]}
     same = next((v for v in existing.values() if check.problems(v, v["id"] + ".json") == [] and
                  isinstance(print_, list) and len(print_) == 512 and check.gap(v["print"], print_) <= check.SAME_VOICE), None)
     if same:                                            # a voice already on the list: add the new channels and Shorts
@@ -89,7 +94,7 @@ def plan(body, existing, download, today=None, reserved=()):
         if merged == same:
             return {"problems": [f"that's {same['id']}, already on the list with these channels and Shorts. Thanks!"]}
         return {"file": same["id"] + ".json", "voice": merged, "new": False, "id": same["id"]}
-    n = max([int(m.group(1)) for k in [*existing, *reserved] for m in [re.fullmatch(r"farm-(\d{4})", k)] if m] + [0]) + 1
+    n = max([int(m.group(1)) for k in [*existing, *(pending or {})] for m in [re.fullmatch(r"farm-(\d{4})", k)] if m] + [0]) + 1
     vid = f"farm-{n:04d}"
     note = re.sub(r"\s+", " ", s.get("evidence", ""))[:200]
     entry = {"id": vid, "model": voice.get("model"), "added": today or datetime.date.today().isoformat(),
@@ -107,11 +112,24 @@ def existing_voices():
     return out
 
 
-def reserved_ids(repo, branch):
-    """Voice ids that other open submission pull requests are adding (this issue's own is not counted)."""
-    prs = json.loads(run("gh", "pr", "list", "--repo", repo, "--state", "open", "--limit", "100", "--json", "headRefName,files") or "[]")
-    return {m.group(1) for pr in prs if pr["headRefName"] != branch for f in pr["files"]
-            for m in [re.fullmatch(r"voices/(farm-\d{4})\.json", f["path"])] if m}
+def pending_voices(repo, branch):
+    """The voices other open submission pull requests add or change, as {id: (voice, pr number)} (this issue's own
+    pull request is left out, so editing an issue still updates its own)."""
+    prs = json.loads(run("gh", "pr", "list", "--repo", repo, "--state", "open", "--limit", "100",
+                         "--json", "number,headRefName,files") or "[]")
+    out = {}
+    for pr in prs:
+        if pr["headRefName"] == branch:
+            continue
+        for f in pr["files"]:
+            m = re.fullmatch(r"voices/(farm-\d{4})\.json", f["path"])
+            if m:
+                try:
+                    out[m.group(1)] = (json.loads(run("gh", "api", f"repos/{repo}/contents/{f['path']}?ref={pr['headRefName']}",
+                                                      "-H", "Accept: application/vnd.github.raw")), pr["number"])
+                except Exception:
+                    pass                                # unreadable: skip it rather than stop the submission
+    return out
 
 
 def download(url):
@@ -152,7 +170,7 @@ def main():
         event = json.load(f)
     repo, issue = os.environ["GITHUB_REPOSITORY"], int(event["issue"]["number"])
     branch = f"submission-{issue}"
-    result = plan(event["issue"].get("body", ""), existing_voices(), download, reserved=reserved_ids(repo, branch))
+    result = plan(event["issue"].get("body", ""), existing_voices(), download, pending=pending_voices(repo, branch))
     if result.get("problems"):
         label(repo, issue, add=True)                    # so the maintainer can skip these; the stale workflow closes them
         comment(repo, issue, "Thanks! This can't be added yet:\n\n" + "\n".join(f"- {p}" for p in result["problems"]) +
